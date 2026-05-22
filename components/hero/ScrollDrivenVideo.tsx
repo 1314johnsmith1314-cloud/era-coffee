@@ -125,7 +125,7 @@ export function ScrollDrivenVideo() {
       const t = next * total;
 
       if (t < d1) {
-        if (v1 && Math.abs(v1.currentTime - t) > 0.04) {
+        if (v1 && Math.abs(v1.currentTime - t) > 0.02) {
           try {
             v1.currentTime = Math.min(t, d1 - 0.05);
           } catch {}
@@ -134,7 +134,7 @@ export function ScrollDrivenVideo() {
       } else {
         if (v2) {
           const t2 = Math.min(t - d1, d2 - 0.05);
-          if (Math.abs(v2.currentTime - t2) > 0.04) {
+          if (Math.abs(v2.currentTime - t2) > 0.02) {
             try {
               v2.currentTime = Math.max(0, t2);
             } catch {}
@@ -147,7 +147,7 @@ export function ScrollDrivenVideo() {
         progressBarRef.current.style.height = `${Math.max(0, Math.min(next * 100, 100))}%`;
       }
 
-      if (Math.abs(next - lastEmittedProgressRef.current) > 0.008 || next === target) {
+      if (Math.abs(next - lastEmittedProgressRef.current) > 0.004 || next === target) {
         lastEmittedProgressRef.current = next;
         setProgress(next);
       }
