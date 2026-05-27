@@ -32,6 +32,9 @@ yarn-error.log*
 # claude code internals
 .claude/
 
+# video re-encode backups (keep local, not in repo)
+public/videos/*.orig.mp4
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

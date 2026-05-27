@@ -1,36 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { HERO_BLOCKS } from './heroContent';
 
 interface TextOverlayProps {
-  progress: number;
+  visibleIndex: number | null;
 }
 
-const TRANSITION_WINDOW = 0.005;
-
-function blockIndexFromProgress(progress: number): number {
-  const clamped = Math.min(Math.max(progress, 0), 0.9999);
-  return Math.min(HERO_BLOCKS.length - 1, Math.floor(clamped * 10));
-}
-
-function isInTransitionGap(progress: number): boolean {
-  const local = (progress * 10) % 1;
-  return local < TRANSITION_WINDOW || local > 1 - TRANSITION_WINDOW;
-}
-
-export function TextOverlay({ progress }: TextOverlayProps) {
-  const [visibleIndex, setVisibleIndex] = useState<number | null>(0);
-
-  useEffect(() => {
-    if (isInTransitionGap(progress)) {
-      setVisibleIndex(null);
-      return;
-    }
-    setVisibleIndex(blockIndexFromProgress(progress));
-  }, [progress]);
-
+export function TextOverlay({ visibleIndex }: TextOverlayProps) {
   const block =
     visibleIndex !== null ? HERO_BLOCKS[visibleIndex] : null;
   const isFinal = visibleIndex === HERO_BLOCKS.length - 1;

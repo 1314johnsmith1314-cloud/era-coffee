@@ -4,12 +4,23 @@ import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { TextOverlay } from './TextOverlay';
+import { HERO_BLOCKS } from './heroContent';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 const PART_DURATION_FALLBACK = 15;
+const SEEK_THRESHOLD = 0.025;
+const TRANSITION_WINDOW = 0.005;
+
+function computeVisibleIndex(progress: number): number | null {
+  if (progress <= 0) return 0;
+  if (progress >= 1) return HERO_BLOCKS.length - 1;
+  const local = (progress * 10) % 1;
+  if (local < TRANSITION_WINDOW || local > 1 - TRANSITION_WINDOW) return null;
+  return Math.min(HERO_BLOCKS.length - 1, Math.floor(progress * 10));
+}
 
 export function ScrollDrivenVideo() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -20,10 +31,10 @@ export function ScrollDrivenVideo() {
 
   const progressRef = useRef(0);
   const targetProgressRef = useRef(0);
-  const lastEmittedProgressRef = useRef(0);
+  const lastIndexRef = useRef<number | null>(0);
   const rafRef = useRef<number | null>(null);
 
-  const [progress, setProgress] = useState(0);
+  const [visibleIndex, setVisibleIndex] = useState<number | null>(0);
   const [videosReady, setVideosReady] = useState(false);
   const [activePart, setActivePart] = useState<1 | 2>(1);
 
@@ -36,9 +47,7 @@ export function ScrollDrivenVideo() {
     let loaded2 = false;
 
     const checkReady = () => {
-      if (loaded1 && loaded2) {
-        setVideosReady(true);
-      }
+      if (loaded1 && loaded2) setVideosReady(true);
     };
 
     const onMeta1 = () => {
@@ -50,16 +59,11 @@ export function ScrollDrivenVideo() {
       checkReady();
     };
 
-    if (v1.readyState >= 1) {
-      onMeta1();
-    } else {
-      v1.addEventListener('loadedmetadata', onMeta1, { once: true });
-    }
-    if (v2.readyState >= 1) {
-      onMeta2();
-    } else {
-      v2.addEventListener('loadedmetadata', onMeta2, { once: true });
-    }
+    if (v1.readyState >= 1) onMeta1();
+    else v1.addEventListener('loadedmetadata', onMeta1, { once: true });
+
+    if (v2.readyState >= 1) onMeta2();
+    else v2.addEventListener('loadedmetadata', onMeta2, { once: true });
 
     const primeVideos = async () => {
       try {
@@ -125,16 +129,20 @@ export function ScrollDrivenVideo() {
       const t = next * total;
 
       if (t < d1) {
-        if (v1 && Math.abs(v1.currentTime - t) > 0.02) {
+        if (
+          v1 &&
+          !v1.seeking &&
+          Math.abs(v1.currentTime - t) > SEEK_THRESHOLD
+        ) {
           try {
             v1.currentTime = Math.min(t, d1 - 0.05);
           } catch {}
         }
         setActivePart((prev) => (prev === 1 ? prev : 1));
       } else {
-        if (v2) {
+        if (v2 && !v2.seeking) {
           const t2 = Math.min(t - d1, d2 - 0.05);
-          if (Math.abs(v2.currentTime - t2) > 0.02) {
+          if (Math.abs(v2.currentTime - t2) > SEEK_THRESHOLD) {
             try {
               v2.currentTime = Math.max(0, t2);
             } catch {}
@@ -147,9 +155,10 @@ export function ScrollDrivenVideo() {
         progressBarRef.current.style.height = `${Math.max(0, Math.min(next * 100, 100))}%`;
       }
 
-      if (Math.abs(next - lastEmittedProgressRef.current) > 0.004 || next === target) {
-        lastEmittedProgressRef.current = next;
-        setProgress(next);
+      const idx = computeVisibleIndex(next);
+      if (idx !== lastIndexRef.current) {
+        lastIndexRef.current = idx;
+        setVisibleIndex(idx);
       }
 
       rafRef.current = requestAnimationFrame(tick);
@@ -160,6 +169,7 @@ export function ScrollDrivenVideo() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       st.kill();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videosReady]);
 
   return (
@@ -203,7 +213,7 @@ export function ScrollDrivenVideo() {
           }}
         />
 
-        <TextOverlay progress={progress} />
+        <TextOverlay visibleIndex={visibleIndex} />
 
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 hidden md:flex flex-col items-center gap-2 text-white/60">
           <span className="text-[10px] uppercase tracking-[0.3em]">Скролл</span>

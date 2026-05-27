@@ -45,6 +45,12 @@ export function Process() {
                 <p className="mt-2 text-sm sm:text-base text-era-dark/65 leading-relaxed">
                   {step.description}
                 </p>
+                {'badge' in step && step.badge && (
+                  <span className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-era-gold/15 text-era-coffee text-[11px] font-semibold uppercase tracking-wide">
+                    <span aria-hidden="true">📍</span>
+                    {step.badge}
+                  </span>
+                )}
               </motion.li>
             ))}
           </ol>

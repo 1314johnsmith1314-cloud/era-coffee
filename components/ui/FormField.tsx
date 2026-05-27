@@ -97,13 +97,17 @@ interface ConsentProps {
 }
 
 export function ConsentCheckbox({ id, error, onDark, registered }: ConsentProps) {
+  const linkClass = cn(
+    'underline underline-offset-2',
+    onDark ? 'text-era-gold hover:text-white' : 'text-era-blue hover:text-era-dark',
+  );
   return (
     <div className="flex flex-col gap-1">
       <label
         htmlFor={id}
         className={cn(
           'flex items-start gap-3 cursor-pointer text-xs leading-relaxed',
-          onDark ? 'text-white/70' : 'text-era-dark/65',
+          onDark ? 'text-white/75' : 'text-era-dark/70',
         )}
       >
         <input
@@ -116,16 +120,19 @@ export function ConsentCheckbox({ id, error, onDark, registered }: ConsentProps)
           {...registered}
         />
         <span>
-          Нажимая кнопку, я соглашаюсь с обработкой персональных данных и{' '}
-          <a
-            href="/privacy"
-            className={cn(
-              'underline underline-offset-2',
-              onDark ? 'text-era-gold' : 'text-era-blue',
-            )}
-          >
-            политикой конфиденциальности
+          Я даю{' '}
+          <a href="/consent" target="_blank" rel="noopener noreferrer" className={linkClass}>
+            согласие на обработку персональных данных
+          </a>{' '}
+          в соответствии с{' '}
+          <a href="/privacy" target="_blank" rel="noopener noreferrer" className={linkClass}>
+            Политикой обработки ПД
+          </a>{' '}
+          и подтверждаю, что ознакомлен(а) с{' '}
+          <a href="/cookies" target="_blank" rel="noopener noreferrer" className={linkClass}>
+            Политикой использования cookies
           </a>
+          .
         </span>
       </label>
       {error && (

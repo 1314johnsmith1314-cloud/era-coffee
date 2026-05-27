@@ -10,14 +10,16 @@ export const SITE = {
 export const CONTACTS = {
   phones: [
     { label: '+7 967 066 39 79', href: 'tel:+79670663979' },
-    { label: '+7 921 909 10 19', href: 'tel:+79219091019' },
   ],
   email: 'info@timetocoffee.ru',
   emailHref: 'mailto:info@timetocoffee.ru',
   site: 'timetocoffee.ru',
   siteHref: 'https://timetocoffee.ru',
   workHours: 'Пн–Пт 9:00–19:00 МСК',
-  max: 'https://max.ru/79670663979',
+  /** Открывает чат в MAX по номеру телефона. Формат с `+` обязателен. */
+  max: 'https://max.ru/+79670663979',
+  /** Открывает чат в Telegram по номеру телефона. Работает, если у владельца
+   *  включена опция «находить меня по номеру» в настройках приватности. */
   telegram: 'https://t.me/+79670663979',
 } as const;
 
@@ -233,7 +235,12 @@ export const BENEFITS = [
 
 export const PROCESS_STEPS = [
   { title: 'Заявка', description: 'Оставляете контакты или звоните напрямую' },
-  { title: 'Бесплатный пробник', description: 'Отправляем 3 вида кофе для дегустации' },
+  {
+    title: 'Бесплатный пробник',
+    description:
+      'Отправляем 3 вида кофе для дегустации — или проводим выездную дегустацию для клиентов из Москвы',
+    badge: 'или выездная дегустация в Москве',
+  },
   { title: 'Договор', description: 'Согласовываем график поставок и условия' },
   { title: 'Свежая обжарка', description: 'Обжариваем зерно под ваш заказ' },
   { title: 'Доставка', description: 'Привозим вовремя по всей России' },

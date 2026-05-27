@@ -1,5 +1,12 @@
 import { Logo } from '@/components/icons/Logo';
-import { CONTACTS, COMPANY, NAV_LINKS, SITE } from '@/lib/constants';
+import { CONTACTS, NAV_LINKS, SITE } from '@/lib/constants';
+import { LEGAL } from '@/lib/legal';
+
+const LEGAL_LINKS = [
+  { href: '/privacy', label: 'Политика обработки ПД' },
+  { href: '/consent', label: 'Согласие на обработку ПД' },
+  { href: '/cookies', label: 'Файлы cookies' },
+];
 
 export function Footer() {
   return (
@@ -75,24 +82,67 @@ export function Footer() {
 
           <div>
             <h4 className="text-sm font-bold uppercase tracking-wider text-white/90">
-              Реквизиты
+              Правовая информация
             </h4>
-            <ul className="mt-4 space-y-1.5 text-sm text-white/70">
-              <li>{COMPANY.name}</li>
-              <li>ОКПО {COMPANY.okpo}</li>
-              <li>ОГРН {COMPANY.ogrn}</li>
-              <li>
-                ИНН/КПП {COMPANY.inn} / {COMPANY.kpp}
-              </li>
+            <ul className="mt-4 space-y-2.5">
+              {LEGAL_LINKS.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    className="text-sm text-white/70 transition-colors hover:text-era-gold"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
-        <div className="mt-14 pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between gap-4 text-xs text-white/50">
+        <div className="mt-12 pt-8 border-t border-white/10 grid gap-6 sm:grid-cols-2">
+          <div className="text-xs text-white/55 leading-relaxed space-y-1">
+            <p className="font-bold text-white/80 text-[11px] uppercase tracking-wider">
+              Реквизиты Оператора
+            </p>
+            <p>{LEGAL.shortName}</p>
+            <p>ИНН {LEGAL.inn} / КПП {LEGAL.kpp}</p>
+            <p>ОГРН {LEGAL.ogrn}</p>
+            <p>ОКПО {LEGAL.okpo}</p>
+          </div>
+          <div className="text-xs text-white/55 leading-relaxed">
+            <p className="font-bold text-white/80 text-[11px] uppercase tracking-wider">
+              Защита персональных данных
+            </p>
+            <p className="mt-1">
+              Данные обрабатываются в соответствии с Федеральным законом № 152-ФЗ
+              «О персональных данных». Регистрация в Реестре операторов ПД
+              Роскомнадзора: {LEGAL.rknRegNumber}.
+            </p>
+            <p className="mt-2">
+              По вопросам обработки ПД:{' '}
+              <a
+                href={`mailto:${LEGAL.privacyEmail}`}
+                className="text-era-gold hover:underline underline-offset-2"
+              >
+                {LEGAL.privacyEmail}
+              </a>
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between gap-3 text-xs text-white/50">
           <span>© 2026 ERA Coffee. Все права защищены.</span>
-          <a href="/privacy" className="hover:text-era-gold transition-colors">
-            Политика конфиденциальности
-          </a>
+          <div className="flex flex-wrap gap-x-5 gap-y-1">
+            {LEGAL_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="hover:text-era-gold transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </footer>
