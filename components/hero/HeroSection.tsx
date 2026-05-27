@@ -21,7 +21,7 @@ export function HeroSection() {
         <div className="relative h-[60vh] min-h-[420px] overflow-hidden">
           <video
             className="absolute inset-0 w-full h-full object-cover"
-            src="/videos/hero-part-1-v3.mp4"
+            src="/videos/hero-part-1-v4.mp4"
             autoPlay
             muted
             playsInline

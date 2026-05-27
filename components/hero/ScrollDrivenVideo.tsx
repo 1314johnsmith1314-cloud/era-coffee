@@ -189,7 +189,7 @@ export function ScrollDrivenVideo() {
           ref={video1Ref}
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
           style={{ opacity: activePart === 1 ? 1 : 0, willChange: 'opacity' }}
-          src="/videos/hero-part-1-v3.mp4"
+          src="/videos/hero-part-1-v4.mp4"
           muted
           playsInline
           {...{ 'webkit-playsinline': 'true' }}
