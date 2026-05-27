@@ -11,13 +11,8 @@ if (typeof window !== 'undefined') {
 }
 
 const PART_DURATION_FALLBACK = 15;
-const SEEK_THRESHOLD = 0.025;
+const SEEK_THRESHOLD = 0.04;
 const TRANSITION_WINDOW = 0.005;
-
-const VIDEO_URLS = [
-  '/videos/hero-part-1.mp4',
-  '/videos/hero-part-2.mp4',
-] as const;
 
 function computeVisibleIndex(progress: number): number | null {
   if (progress <= 0) return 0;
@@ -25,27 +20,6 @@ function computeVisibleIndex(progress: number): number | null {
   const local = (progress * 10) % 1;
   if (local < TRANSITION_WINDOW || local > 1 - TRANSITION_WINDOW) return null;
   return Math.min(HERO_BLOCKS.length - 1, Math.floor(progress * 10));
-}
-
-async function fetchAsBlob(
-  url: string,
-  onProgress?: (loaded: number, total: number) => void,
-): Promise<Blob> {
-  const res = await fetch(url, { cache: 'force-cache' });
-  if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
-  if (!res.body) return res.blob();
-  const total = Number(res.headers.get('Content-Length')) || 0;
-  const reader = res.body.getReader();
-  const chunks: BlobPart[] = [];
-  let loaded = 0;
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-    loaded += value.length;
-    onProgress?.(loaded, total);
-  }
-  return new Blob(chunks, { type: 'video/mp4' });
 }
 
 export function ScrollDrivenVideo() {
@@ -59,78 +33,61 @@ export function ScrollDrivenVideo() {
   const targetProgressRef = useRef(0);
   const lastIndexRef = useRef<number | null>(0);
   const rafRef = useRef<number | null>(null);
-  const blobUrlsRef = useRef<string[]>([]);
 
   const [visibleIndex, setVisibleIndex] = useState<number | null>(0);
   const [videosReady, setVideosReady] = useState(false);
-  const [downloadProgress, setDownloadProgress] = useState(0);
   const [activePart, setActivePart] = useState<1 | 2>(1);
 
   useEffect(() => {
-    let cancelled = false;
-    const totals = [0, 0];
-    const loadeds = [0, 0];
+    const v1 = video1Ref.current;
+    const v2 = video2Ref.current;
+    if (!v1 || !v2) return;
 
-    const updateProgress = () => {
-      const total = totals[0] + totals[1];
-      const loaded = loadeds[0] + loadeds[1];
-      if (total > 0) setDownloadProgress(Math.min(1, loaded / total));
+    let loaded1 = false;
+    let loaded2 = false;
+
+    const checkReady = () => {
+      if (loaded1 && loaded2) setVideosReady(true);
     };
 
-    Promise.all(
-      VIDEO_URLS.map((url, idx) =>
-        fetchAsBlob(url, (loaded, total) => {
-          loadeds[idx] = loaded;
-          totals[idx] = total;
-          updateProgress();
-        }),
-      ),
-    )
-      .then(async (blobs) => {
-        if (cancelled) return;
-        const urls = blobs.map((b) => URL.createObjectURL(b));
-        blobUrlsRef.current = urls;
-        setDownloadProgress(1);
+    const onMeta1 = () => {
+      loaded1 = true;
+      checkReady();
+    };
+    const onMeta2 = () => {
+      loaded2 = true;
+      checkReady();
+    };
 
-        const v1 = video1Ref.current;
-        const v2 = video2Ref.current;
-        if (v1) v1.src = urls[0];
-        if (v2) v2.src = urls[1];
+    if (v1.readyState >= 1) onMeta1();
+    else v1.addEventListener('loadedmetadata', onMeta1, { once: true });
 
-        const waitForMeta = (v: HTMLVideoElement | null) =>
-          new Promise<void>((resolve) => {
-            if (!v) return resolve();
-            if (v.readyState >= 1) return resolve();
-            v.addEventListener('loadedmetadata', () => resolve(), { once: true });
-          });
+    if (v2.readyState >= 1) onMeta2();
+    else v2.addEventListener('loadedmetadata', onMeta2, { once: true });
 
-        await Promise.all([waitForMeta(v1), waitForMeta(v2)]);
-        if (cancelled) return;
-
+    const primeVideos = async () => {
+      try {
+        await Promise.allSettled([v1.play(), v2.play()]);
+      } finally {
+        v1.pause();
+        v2.pause();
         try {
-          if (v1 && v2) {
-            await Promise.allSettled([v1.play(), v2.play()]);
-            v1.pause();
-            v2.pause();
-            v1.currentTime = 0;
-            v2.currentTime = 0;
-          }
+          v1.currentTime = 0;
+          v2.currentTime = 0;
         } catch {}
+      }
+    };
+    primeVideos();
 
-        setVideosReady(true);
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          // eslint-disable-next-line no-console
-          console.error('Hero video preload failed', err);
-          setVideosReady(true);
-        }
-      });
+    // Fallback: if metadata events never fire (e.g. offline or blocked), unblock after a delay.
+    const safety = setTimeout(() => {
+      if (!loaded1 || !loaded2) setVideosReady(true);
+    }, 4000);
 
     return () => {
-      cancelled = true;
-      blobUrlsRef.current.forEach((u) => URL.revokeObjectURL(u));
-      blobUrlsRef.current = [];
+      clearTimeout(safety);
+      v1.removeEventListener('loadedmetadata', onMeta1);
+      v2.removeEventListener('loadedmetadata', onMeta2);
     };
   }, []);
 
@@ -222,8 +179,6 @@ export function ScrollDrivenVideo() {
     };
   }, [videosReady]);
 
-  const downloadPct = Math.round(downloadProgress * 100);
-
   return (
     <div ref={containerRef} className="relative w-full" style={{ height: '1000vh' }}>
       <div
@@ -233,7 +188,8 @@ export function ScrollDrivenVideo() {
         <video
           ref={video1Ref}
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-          style={{ opacity: activePart === 1 && videosReady ? 1 : 0, willChange: 'opacity' }}
+          style={{ opacity: activePart === 1 ? 1 : 0, willChange: 'opacity' }}
+          src="/videos/hero-part-1.mp4"
           muted
           playsInline
           {...{ 'webkit-playsinline': 'true' }}
@@ -245,7 +201,8 @@ export function ScrollDrivenVideo() {
         <video
           ref={video2Ref}
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-          style={{ opacity: activePart === 2 && videosReady ? 1 : 0, willChange: 'opacity' }}
+          style={{ opacity: activePart === 2 ? 1 : 0, willChange: 'opacity' }}
+          src="/videos/hero-part-2.mp4"
           muted
           playsInline
           {...{ 'webkit-playsinline': 'true' }}
@@ -263,29 +220,7 @@ export function ScrollDrivenVideo() {
           }}
         />
 
-        {!videosReady && (
-          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-            <div className="text-center w-[280px] max-w-[80vw]">
-              <span className="block text-era-gold font-semibold uppercase tracking-[0.3em] text-xs">
-                — ERA Coffee —
-              </span>
-              <p className="mt-4 text-white/90 text-base font-medium">
-                Подготовка анимации…
-              </p>
-              <div className="mt-5 h-1 rounded-full bg-white/15 overflow-hidden">
-                <div
-                  className="h-full bg-era-gold transition-[width] duration-200 ease-out"
-                  style={{ width: `${downloadPct}%` }}
-                />
-              </div>
-              <p className="mt-2 text-white/55 text-xs tabular-nums">
-                {downloadPct}%
-              </p>
-            </div>
-          </div>
-        )}
-
-        <TextOverlay visibleIndex={videosReady ? visibleIndex : null} />
+        <TextOverlay visibleIndex={visibleIndex} />
 
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 hidden md:flex flex-col items-center gap-2 text-white/60">
           <span className="text-[10px] uppercase tracking-[0.3em]">Скролл</span>
