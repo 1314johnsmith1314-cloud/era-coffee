@@ -11,7 +11,7 @@ if (typeof window !== 'undefined') {
 }
 
 const PART_DURATION_FALLBACK = 15;
-const SEEK_THRESHOLD = 0.04;
+const SEEK_THRESHOLD = 0.025;
 const TRANSITION_WINDOW = 0.005;
 
 function computeVisibleIndex(progress: number): number | null {
@@ -189,7 +189,7 @@ export function ScrollDrivenVideo() {
           ref={video1Ref}
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
           style={{ opacity: activePart === 1 ? 1 : 0, willChange: 'opacity' }}
-          src="/videos/hero-part-1-v2.mp4"
+          src="/videos/hero-part-1-v3.mp4"
           muted
           playsInline
           {...{ 'webkit-playsinline': 'true' }}
