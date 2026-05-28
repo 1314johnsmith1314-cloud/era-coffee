@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  *
  * Доставка настраивается через переменные окружения (.env.local):
  *
- *   SMTP (письмо на почту — основной канал):
+ *   SMTP (письмо на почту):
  *     SMTP_HOST=smtp.yandex.ru
  *     SMTP_PORT=465
  *     SMTP_USER=info@eracoffee.ru
@@ -17,11 +17,7 @@ export const dynamic = 'force-dynamic';
  *     SMTP_FROM="ERA Coffee <info@eracoffee.ru>"   (опц., по умолчанию = SMTP_USER)
  *     LEAD_EMAIL_TO=info@eracoffee.ru               (опц., куда слать; по умолч. = SMTP_USER)
  *
- *   Telegram (мгновенные уведомления — опционально, как дубль):
- *     TELEGRAM_BOT_TOKEN=123456:ABC...
- *     TELEGRAM_CHAT_ID=123456789
- *
- * Если ничего не задано — заявка пишется в лог сервера (pm2 logs),
+ * Если SMTP не задан — заявка пишется в лог сервера (pm2 logs),
  * чтобы данные не терялись даже без настроенной доставки.
  */
 
@@ -100,24 +96,6 @@ async function sendEmail(subject: string, text: string) {
   return true;
 }
 
-async function sendTelegram(text: string) {
-  const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } = process.env;
-  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return false;
-  const res = await fetch(
-    `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-    {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text,
-        disable_web_page_preview: true,
-      }),
-    },
-  );
-  return res.ok;
-}
-
 export async function POST(request: Request) {
   let data: Record<string, unknown>;
   try {
@@ -133,21 +111,18 @@ export async function POST(request: Request) {
   const stamp = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' });
   const text = [`🟦 ${title}`, '', ...lines, '', `Время: ${stamp} (МСК)`, 'Источник: eracoffee.ru'].join('\n');
 
-  const results = await Promise.allSettled([sendEmail(subject, text), sendTelegram(text)]);
-  const emailSent = results[0].status === 'fulfilled' && results[0].value === true;
-  const tgSent = results[1].status === 'fulfilled' && results[1].value === true;
+  let emailSent = false;
+  try {
+    emailSent = await sendEmail(subject, text);
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('[lead] email delivery error:', err);
+  }
 
   // Логируем всегда — резервная копия в pm2 logs, чтобы не потерять заявку,
-  // даже если SMTP/Telegram не настроены или дали сбой.
+  // даже если SMTP не настроен или дал сбой.
   // eslint-disable-next-line no-console
-  console.log('[lead]', JSON.stringify({ formType, emailSent, tgSent, data }));
-
-  for (const r of results) {
-    if (r.status === 'rejected') {
-      // eslint-disable-next-line no-console
-      console.error('[lead] delivery error:', r.reason);
-    }
-  }
+  console.log('[lead]', JSON.stringify({ formType, emailSent, data }));
 
   // Пользователю всегда возвращаем успех: заявка как минимум в логах.
   return NextResponse.json({ ok: true });
