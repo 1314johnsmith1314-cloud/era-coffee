@@ -5,7 +5,7 @@ import {
   LegalList,
   LegalKeyVal,
 } from '@/components/layout/LegalPageLayout';
-import { LEGAL } from '@/lib/legal';
+import { LEGAL, LEGAL_HAS_OKPO, LEGAL_HAS_RKN } from '@/lib/legal';
 
 export const metadata: Metadata = {
   title: 'Политика обработки персональных данных — ERA Coffee',
@@ -87,10 +87,11 @@ export default function PrivacyPage() {
         <dl className="mt-2 rounded-card bg-era-cream-soft border border-black/5 px-5 py-4">
           <LegalKeyVal label="Полное наименование" value={LEGAL.fullName} />
           <LegalKeyVal label="Сокращённое наименование" value={LEGAL.shortName} />
+          <LegalKeyVal label="Генеральный директор" value={LEGAL.director} />
           <LegalKeyVal label="ИНН" value={LEGAL.inn} />
           <LegalKeyVal label="КПП" value={LEGAL.kpp} />
           <LegalKeyVal label="ОГРН" value={LEGAL.ogrn} />
-          <LegalKeyVal label="ОКПО" value={LEGAL.okpo} />
+          {LEGAL_HAS_OKPO && <LegalKeyVal label="ОКПО" value={LEGAL.okpo} />}
           <LegalKeyVal label="Юридический адрес" value={LEGAL.legalAddress} />
           <LegalKeyVal label="Почтовый адрес" value={LEGAL.postalAddress} />
           <LegalKeyVal
@@ -105,10 +106,12 @@ export default function PrivacyPage() {
             }
           />
           <LegalKeyVal label="Телефон" value={LEGAL.contactPhone} />
-          <LegalKeyVal
-            label="Регистрация в Реестре операторов"
-            value={`${LEGAL.rknRegNumber} от ${LEGAL.rknRegDate}`}
-          />
+          {LEGAL_HAS_RKN && (
+            <LegalKeyVal
+              label="Регистрация в Реестре операторов"
+              value={`${LEGAL.rknRegNumber} от ${LEGAL.rknRegDate}`}
+            />
+          )}
         </dl>
 
         <p className="mt-4">

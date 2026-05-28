@@ -1,6 +1,6 @@
 import { Logo } from '@/components/icons/Logo';
 import { CONTACTS, NAV_LINKS, SITE } from '@/lib/constants';
-import { LEGAL } from '@/lib/legal';
+import { LEGAL, LEGAL_HAS_OKPO, LEGAL_HAS_RKN } from '@/lib/legal';
 
 const LEGAL_LINKS = [
   { href: '/privacy', label: 'Политика обработки ПД' },
@@ -107,7 +107,8 @@ export function Footer() {
             <p>{LEGAL.shortName}</p>
             <p>ИНН {LEGAL.inn} / КПП {LEGAL.kpp}</p>
             <p>ОГРН {LEGAL.ogrn}</p>
-            <p>ОКПО {LEGAL.okpo}</p>
+            {LEGAL_HAS_OKPO && <p>ОКПО {LEGAL.okpo}</p>}
+            <p>{LEGAL.legalAddress}</p>
           </div>
           <div className="text-xs text-white/55 leading-relaxed">
             <p className="font-bold text-white/80 text-[11px] uppercase tracking-wider">
@@ -115,8 +116,10 @@ export function Footer() {
             </p>
             <p className="mt-1">
               Данные обрабатываются в соответствии с Федеральным законом № 152-ФЗ
-              «О персональных данных». Регистрация в Реестре операторов ПД
-              Роскомнадзора: {LEGAL.rknRegNumber}.
+              «О персональных данных».
+              {LEGAL_HAS_RKN
+                ? ` Регистрация в Реестре операторов ПД Роскомнадзора: ${LEGAL.rknRegNumber}.`
+                : ''}
             </p>
             <p className="mt-2">
               По вопросам обработки ПД:{' '}
