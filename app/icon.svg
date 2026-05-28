@@ -1,0 +1,29 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#27479B"/>
+      <stop offset="1" stop-color="#13265F"/>
+    </linearGradient>
+    <linearGradient id="bean" x1="20" y1="14" x2="44" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E4C99A"/>
+      <stop offset="1" stop-color="#C9A876"/>
+    </linearGradient>
+  </defs>
+
+  <!-- squircle background -->
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+
+  <!-- subtle globe meridians -->
+  <g stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="1.5" fill="none">
+    <circle cx="32" cy="32" r="22"/>
+    <path d="M32 10 C 20 22 20 42 32 54"/>
+    <path d="M32 10 C 44 22 44 42 32 54"/>
+    <path d="M10 32 H 54"/>
+  </g>
+
+  <!-- coffee bean -->
+  <g transform="rotate(28 32 32)">
+    <ellipse cx="32" cy="32" rx="12.5" ry="18" fill="url(#bean)"/>
+    <path d="M32 16 C 35 24 35 40 32 48" stroke="#13265F" stroke-opacity="0.55" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

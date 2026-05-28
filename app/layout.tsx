@@ -41,9 +41,7 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  icons: {
-    icon: '/favicon.svg',
-  },
+  manifest: '/manifest.webmanifest',
 };
 
 const YM_ID = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID;
