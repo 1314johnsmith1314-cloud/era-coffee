@@ -34,7 +34,7 @@ export const LEGAL = {
   postalAddress:
     '107113, г. Москва, вн. тер. г. муниципальный округ Сокольники, ул. Маленковская, д. 14, к. 3, помещ. 4/1',
   /** Контактный email оператора */
-  contactEmail: 'info@timetocoffee.ru',
+  contactEmail: 'info@eracoffee.ru',
   /** Контактный телефон оператора */
   contactPhone: '+7 967 066 39 79',
   /** ФИО лица, ответственного за организацию обработки ПД */
@@ -42,15 +42,15 @@ export const LEGAL = {
   /** Должность ответственного */
   responsibleRole: 'Генеральный директор',
   /** Email для запросов субъектов ПД */
-  privacyEmail: 'info@timetocoffee.ru',
+  privacyEmail: 'info@eracoffee.ru',
   /** Номер уведомления (регистрации) в Реестре операторов ПД Роскомнадзора.
    *  Пусто = ещё не зарегистрирован, строка на сайте скрыта. */
   rknRegNumber: '',
   /** Дата регистрации в реестре операторов */
   rknRegDate: '',
   /** Домен сайта */
-  domain: 'timetocoffee.ru',
-  siteUrl: 'https://timetocoffee.ru',
+  domain: 'eracoffee.ru',
+  siteUrl: 'https://eracoffee.ru',
   /** Дата вступления текущей редакции в силу */
   effectiveDate: '27 мая 2026 г.',
 } as const;

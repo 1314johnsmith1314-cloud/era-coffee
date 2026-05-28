@@ -2,8 +2,8 @@ export const SITE = {
   brand: 'ERA Coffee',
   legalName: 'ООО «ГЛОБАЛ БРИДЖ»',
   slogan: 'Начни свою эру вкуса',
-  domain: 'timetocoffee.ru',
-  url: 'https://timetocoffee.ru',
+  domain: 'eracoffee.ru',
+  url: 'https://eracoffee.ru',
   yearFounded: 2013,
 } as const;
 
@@ -11,10 +11,10 @@ export const CONTACTS = {
   phones: [
     { label: '+7 967 066 39 79', href: 'tel:+79670663979' },
   ],
-  email: 'info@timetocoffee.ru',
-  emailHref: 'mailto:info@timetocoffee.ru',
-  site: 'timetocoffee.ru',
-  siteHref: 'https://timetocoffee.ru',
+  email: 'info@eracoffee.ru',
+  emailHref: 'mailto:info@eracoffee.ru',
+  site: 'eracoffee.ru',
+  siteHref: 'https://eracoffee.ru',
   workHours: 'Пн–Пт 9:00–19:00 МСК',
   /** Открывает чат в MAX по номеру телефона. Формат с `+` обязателен. */
   max: 'https://max.ru/+79670663979',

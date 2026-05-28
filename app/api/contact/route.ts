@@ -8,13 +8,13 @@ import { NextResponse } from 'next/server';
  *   1. npm install resend
  *   2. Добавить в .env.local:
  *        RESEND_API_KEY=re_xxx
- *        CONTACT_EMAIL_TO=info@timetocoffee.ru
+ *        CONTACT_EMAIL_TO=info@eracoffee.ru
  *   3. Раскомментировать блок ниже и удалить console.log.
  *
  *   import { Resend } from 'resend';
  *   const resend = new Resend(process.env.RESEND_API_KEY);
  *   await resend.emails.send({
- *     from: 'ERA Coffee <noreply@timetocoffee.ru>',
+ *     from: 'ERA Coffee <noreply@eracoffee.ru>',
  *     to: process.env.CONTACT_EMAIL_TO!,
  *     subject: `Заявка с сайта — ${data.formType}`,
  *     text: JSON.stringify(data, null, 2),
