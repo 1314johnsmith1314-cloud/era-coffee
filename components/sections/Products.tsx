@@ -56,7 +56,7 @@ export function Products() {
               Не знаете, какой кофе выбрать?
             </h3>
             <p className="mt-1 text-era-dark/70">
-              Закажите бесплатный пробник всех трёх — отправим по 100 г каждого
+              Закажите бесплатный пробник всех трёх — отправим по 250 г каждого
             </p>
           </div>
           <a href="#sampler" className="btn-primary w-full md:w-auto">

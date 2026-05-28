@@ -89,7 +89,7 @@ export const PRODUCTS: Product[] = [
     acidity: 3,
     bitterness: 2,
     descriptors: ['шоколад', 'орехи', 'какао'],
-    weights: ['500 г', '1 кг'],
+    weights: ['1 кг'],
     color: 'blue',
     priceFrom: 1530,
     priceRetail: 2200,
@@ -107,7 +107,7 @@ export const PRODUCTS: Product[] = [
     acidity: 2,
     bitterness: 3,
     descriptors: ['шоколад', 'орехи'],
-    weights: ['500 г', '1 кг'],
+    weights: ['1 кг'],
     color: 'green',
     priceFrom: 1530,
     priceRetail: 2200,
@@ -125,7 +125,7 @@ export const PRODUCTS: Product[] = [
     acidity: 2,
     bitterness: 3,
     descriptors: ['карамель', 'шоколад', 'кешью'],
-    weights: ['500 г', '1 кг'],
+    weights: ['1 кг'],
     color: 'purple',
     priceFrom: 1360,
     priceRetail: 1900,
@@ -151,11 +151,11 @@ export const PRICING: Record<ProductKey, number[]> = {
 export const FAQ_ITEMS = [
   {
     q: 'Как получить бесплатный пробник?',
-    a: 'Оставьте заявку через любую форму на сайте или позвоните нам. Отправим 3 вида кофе по 100 г каждого. Доставка пробника — бесплатно по России.',
+    a: 'Оставьте заявку через любую форму на сайте или позвоните нам. Отправим 3 вида кофе по 250 г каждого. Доставка пробника — бесплатно по России.',
   },
   {
     q: 'Какая минимальная партия?',
-    a: 'Розница — от 500 г. Оптовые условия начинаются от 3 кг. Для крупных клиентов (от 50 кг) — индивидуальные цены и условия отсрочки.',
+    a: 'Кофе продаётся в упаковках по 1 кг. Оптовые условия начинаются от 3 кг. Для крупных клиентов (от 50 кг) — индивидуальные цены и условия отсрочки.',
   },
   {
     q: 'Как быстро привозите кофе?',
@@ -232,46 +232,83 @@ export const BENEFITS = [
   },
 ];
 
-export const PROCESS_STEPS = [
-  { title: 'Заявка', description: 'Оставляете контакты или звоните напрямую' },
+export interface ProcessStep {
+  title: string;
+  description: string;
+  icon: string;
+  badge?: string;
+}
+
+export const PROCESS_STEPS: ProcessStep[] = [
+  {
+    title: 'Заявка',
+    description: 'Оставляете контакты или звоните напрямую',
+    icon: 'request',
+  },
   {
     title: 'Бесплатный пробник',
     description:
       'Отправляем 3 вида кофе для дегустации — или проводим выездную дегустацию для клиентов из Москвы',
     badge: 'или выездная дегустация в Москве',
+    icon: 'sampler',
   },
-  { title: 'Договор', description: 'Согласовываем график поставок и условия' },
-  { title: 'Свежая обжарка', description: 'Обжариваем зерно под ваш заказ' },
-  { title: 'Доставка', description: 'Привозим вовремя по всей России' },
+  {
+    title: 'Договор',
+    description: 'Согласовываем график поставок и условия',
+    icon: 'contract',
+  },
+  {
+    title: 'Свежая обжарка',
+    description: 'Обжариваем зерно под ваш заказ',
+    icon: 'roast',
+  },
+  {
+    title: 'Доставка',
+    description: 'Привозим вовремя по всей России',
+    icon: 'delivery',
+  },
 ];
 
-export const COMPARE_TABLE = [
+export interface CompareRow {
+  criterion: string;
+  icon: string;
+  elite: string;
+  blend: string;
+  mocco: string;
+}
+
+export const COMPARE_TABLE: CompareRow[] = [
   {
     criterion: 'Для какого бизнеса',
+    icon: 'business',
     elite: 'Премиум-кофейни, рестораны',
     blend: 'Универсал для любых заведений',
     mocco: 'Кофейни с упором на десертные напитки',
   },
   {
     criterion: 'Вкусовой профиль',
+    icon: 'taste',
     elite: 'Насыщенный, с кислинкой',
     blend: 'Сбалансированный',
     mocco: 'Мягкий, сладкий',
   },
   {
     criterion: 'С молоком?',
+    icon: 'milk',
     elite: 'Подходит',
     blend: 'Идеально',
     mocco: 'Идеально',
   },
   {
     criterion: 'Кислотность',
+    icon: 'acidity',
     elite: 'Средняя',
     blend: 'Умеренная',
     mocco: 'Слабая',
   },
   {
     criterion: 'Стоимость от',
+    icon: 'price',
     elite: '1530₽/кг',
     blend: '1530₽/кг',
     mocco: '1360₽/кг',

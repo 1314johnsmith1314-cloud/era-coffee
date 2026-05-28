@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -165,6 +165,7 @@ function TabButton({
 }
 
 function SamplesTab({ onSuccess }: { onSuccess: () => void }) {
+  const SAMPLE_GRAMS = 250;
   const {
     control,
     register,
@@ -174,17 +175,16 @@ function SamplesTab({ onSuccess }: { onSuccess: () => void }) {
     formState: { errors, isSubmitting },
   } = useForm<SampleOrderForm>({
     resolver: zodResolver(sampleOrderSchema),
-    defaultValues: { samples: ['elite', 'blend', 'mocco'], perSample: '100' },
+    defaultValues: { samples: ['elite', 'blend', 'mocco'] },
   });
 
   const samples = watch('samples') || [];
-  const perSample = watch('perSample');
 
   const onSubmit = handleSubmit(async (data) => {
     await fetch('/api/contact', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ formType: 'sample-order', ...data }),
+      body: JSON.stringify({ formType: 'sample-order', perSample: SAMPLE_GRAMS, ...data }),
     });
     reset();
     onSuccess();
@@ -200,7 +200,7 @@ function SamplesTab({ onSuccess }: { onSuccess: () => void }) {
         <div>
           <h3 className="text-xl font-bold">Выберите сорта</h3>
           <p className="mt-1.5 text-sm text-white/70">
-            Отметьте сорта, которые хотите попробовать
+            Каждый образец — пакет 250 г. Отметьте сорта, которые хотите попробовать
           </p>
 
           <Controller
@@ -242,7 +242,8 @@ function SamplesTab({ onSuccess }: { onSuccess: () => void }) {
                         {checked && <CheckIcon className="w-4 h-4" />}
                       </span>
                       <span className={`w-3 h-3 rounded-full ${COLOR_DOT[p.color]}`} />
-                      <span className="font-semibold">{p.name}</span>
+                      <span className="font-semibold flex-1">{p.name}</span>
+                      <span className="text-xs text-white/60 font-medium">250 г</span>
                     </label>
                   );
                 })}
@@ -255,34 +256,10 @@ function SamplesTab({ onSuccess }: { onSuccess: () => void }) {
             </span>
           )}
 
-          <h3 className="mt-7 text-xl font-bold">Объём пробника каждого сорта</h3>
-          <Controller
-            control={control}
-            name="perSample"
-            render={({ field }) => (
-              <div className="mt-3 grid grid-cols-3 gap-2">
-                {(['100', '200', '500'] as const).map((opt) => (
-                  <button
-                    type="button"
-                    key={opt}
-                    onClick={() => field.onChange(opt)}
-                    className={cn(
-                      'rounded-btn py-3 text-sm font-semibold transition-colors',
-                      field.value === opt
-                        ? 'bg-white text-era-blue'
-                        : 'bg-white/10 text-white hover:bg-white/15',
-                    )}
-                  >
-                    {opt} г
-                  </button>
-                ))}
-              </div>
-            )}
-          />
-
           <div className="mt-5 rounded-card bg-white/8 border border-white/10 px-4 py-3 text-sm text-white/85">
-            Итого: <strong>{samples.length}</strong> {pluralRu(samples.length, ['сорт', 'сорта', 'сортов'])} ·{' '}
-            <strong>{Number(perSample) * samples.length} г</strong> всего ·{' '}
+            Итого: <strong>{samples.length}</strong>{' '}
+            {pluralRu(samples.length, ['сорт', 'сорта', 'сортов'])} по 250 г ·{' '}
+            <strong>{SAMPLE_GRAMS * samples.length} г</strong> всего ·{' '}
             <span className="text-era-gold font-semibold">бесплатно</span>
           </div>
         </div>
@@ -335,7 +312,6 @@ function tierIndex(kg: number): number {
 
 function CalculatorTab({ onSuccess }: { onSuccess: () => void }) {
   const [productKey, setProductKey] = useState<ProductKey>('elite');
-  const [pack, setPack] = useState<'500' | '1000'>('1000');
   const [kg, setKg] = useState(10);
 
   const {
@@ -346,7 +322,7 @@ function CalculatorTab({ onSuccess }: { onSuccess: () => void }) {
     setValue,
   } = useForm<CalculatorForm>({
     resolver: zodResolver(calculatorSchema),
-    defaultValues: { product: 'elite', pack: '1000', kg: 10 },
+    defaultValues: { product: 'elite', kg: 10 },
   });
 
   const tier = tierIndex(kg);
@@ -357,10 +333,8 @@ function CalculatorTab({ onSuccess }: { onSuccess: () => void }) {
   const savedPerKg = retailPerKg - pricePerKg;
   const savedTotal = savedPerKg * kg;
   const discountPct = Math.round((savedPerKg / retailPerKg) * 100);
-  const packs = useMemo(
-    () => Math.ceil((kg * 1000) / Number(pack)),
-    [kg, pack],
-  );
+  // Кофе фасуется только в пакеты по 1 кг → пачек = кг
+  const packs = kg;
 
   const onSubmit = handleSubmit(async (data) => {
     await fetch('/api/contact', {
@@ -382,10 +356,6 @@ function CalculatorTab({ onSuccess }: { onSuccess: () => void }) {
     setProductKey(key);
     setValue('product', key, { shouldValidate: true });
   };
-  const handlePack = (p: '500' | '1000') => {
-    setPack(p);
-    setValue('pack', p, { shouldValidate: true });
-  };
   const handleKg = (v: number) => {
     const clamped = Math.max(1, Math.min(1000, v));
     setKg(clamped);
@@ -399,7 +369,6 @@ function CalculatorTab({ onSuccess }: { onSuccess: () => void }) {
       className="rounded-card bg-white/[0.06] backdrop-blur-md border border-white/15 p-6 sm:p-8"
     >
       <input type="hidden" {...register('product')} value={productKey} />
-      <input type="hidden" {...register('pack')} value={pack} />
       <input type="hidden" {...register('kg')} value={kg} />
 
       <div className="grid lg:grid-cols-[1fr_360px] gap-8 lg:gap-10">
@@ -432,29 +401,9 @@ function CalculatorTab({ onSuccess }: { onSuccess: () => void }) {
           </div>
 
           <div>
-            <h3 className="text-xl font-bold">2. Фасовка</h3>
-            <div className="mt-3 grid grid-cols-2 gap-2 max-w-sm">
-              {(['500', '1000'] as const).map((p) => (
-                <button
-                  type="button"
-                  key={p}
-                  onClick={() => handlePack(p)}
-                  className={cn(
-                    'rounded-btn py-3 font-semibold transition-colors',
-                    pack === p
-                      ? 'bg-white text-era-blue'
-                      : 'bg-white/10 text-white hover:bg-white/15',
-                  )}
-                >
-                  {p === '500' ? '500 г' : '1 кг'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-baseline justify-between">
-              <h3 className="text-xl font-bold">3. Общий объём</h3>
+            <div className="flex items-baseline justify-between flex-wrap gap-2">
+              <h3 className="text-xl font-bold">2. Объём заказа</h3>
+              <span className="text-xs text-white/55">фасовка — пакеты по 1 кг</span>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -525,8 +474,7 @@ function CalculatorTab({ onSuccess }: { onSuccess: () => void }) {
 
         <div className="rounded-card bg-white text-era-dark p-6 sm:p-7 flex flex-col">
           <span className="text-xs uppercase tracking-wider text-era-dark/55">
-            {product.name} · {pack === '500' ? '500 г' : '1 кг'} · {packs}{' '}
-            {pluralRu(packs, ['пачка', 'пачки', 'пачек'])}
+            {product.name} · {packs} {pluralRu(packs, ['пакет', 'пакета', 'пакетов'])} по 1 кг
           </span>
 
           <AnimatePresence mode="wait">
@@ -566,7 +514,7 @@ function CalculatorTab({ onSuccess }: { onSuccess: () => void }) {
             <div className="flex items-baseline justify-between">
               <dt className="text-era-dark/65">Объём заказа</dt>
               <dd className="font-bold tabular-nums">
-                {kg} кг · {packs} {pluralRu(packs, ['пачка', 'пачки', 'пачек'])}
+                {kg} кг · {packs} {pluralRu(packs, ['пакет', 'пакета', 'пакетов'])}
               </dd>
             </div>
             <div className="flex items-baseline justify-between">

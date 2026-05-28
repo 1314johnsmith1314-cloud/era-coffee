@@ -36,7 +36,6 @@ export const sampleOrderSchema = z.object({
   samples: z
     .array(z.enum(['elite', 'blend', 'mocco']))
     .min(1, 'Выберите хотя бы один сорт'),
-  perSample: z.enum(['100', '200', '500']),
   name: nameSchema,
   phone: phoneSchema,
   consent: z.literal(true, {
@@ -47,7 +46,6 @@ export type SampleOrderForm = z.infer<typeof sampleOrderSchema>;
 
 export const calculatorSchema = z.object({
   product: z.enum(['elite', 'blend', 'mocco']),
-  pack: z.enum(['500', '1000']),
   kg: z.coerce.number().min(1).max(1000),
   name: nameSchema,
   phone: phoneSchema,
