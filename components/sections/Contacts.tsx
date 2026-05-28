@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/FormField';
 import { SuccessModal } from '@/components/ui/SuccessModal';
 import {
-  MaxIcon,
   TelegramIcon,
   PhoneIcon,
   MailIcon,
@@ -91,16 +90,6 @@ export function Contacts() {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <a
-                href={CONTACTS.max}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-btn bg-gradient-to-br from-[#3D7BFF] to-[#1B3A8B] text-white font-semibold px-5 py-3 transition-transform hover:scale-[1.02]"
-                style={{ minHeight: 48 }}
-              >
-                <MaxIcon className="w-5 h-5" />
-                MAX
-              </a>
-              <a
                 href={CONTACTS.telegram}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -108,7 +97,7 @@ export function Contacts() {
                 style={{ minHeight: 48 }}
               >
                 <TelegramIcon className="w-5 h-5" />
-                Telegram
+                Написать в Telegram
               </a>
             </div>
 

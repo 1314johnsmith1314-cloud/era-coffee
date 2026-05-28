@@ -1,13 +1,3 @@
-export function MaxIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M3 4.5C3 3.67 3.67 3 4.5 3h15A1.5 1.5 0 0 1 21 4.5v11.25c0 .83-.67 1.5-1.5 1.5H9.62l-4.45 3.95A1 1 0 0 1 3.5 20.4V4.5z" />
-      <path d="M7.5 14.5V9.2l3 4.05L13.5 9.2v5.3h-1.7v-2.5l-1.3 1.75-1.3-1.75v2.5z" fill="#1B3A8B" />
-      <path d="M14.6 14.5l1.55-2.65-1.45-2.65h1.8l.85 1.6.85-1.6h1.65l-1.45 2.65 1.55 2.65h-1.85l-.95-1.75-.95 1.75z" fill="#1B3A8B" />
-    </svg>
-  );
-}
-
 export function WhatsAppIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
