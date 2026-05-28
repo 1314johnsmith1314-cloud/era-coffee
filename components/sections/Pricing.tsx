@@ -99,7 +99,11 @@ export function Pricing() {
         </div>
 
         <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-center">
-          <a href="#pdf-magnet" className="btn-secondary w-full sm:w-auto">
+          <a
+            href="/era-coffee-price.pdf"
+            download="ERA-Coffee-прайс.pdf"
+            className="btn-secondary w-full sm:w-auto"
+          >
             Скачать прайс PDF
           </a>
           <a href="#final-cta" className="btn-primary w-full sm:w-auto">

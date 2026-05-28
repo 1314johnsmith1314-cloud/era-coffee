@@ -18,13 +18,24 @@ export function PdfLeadMagnet() {
     formState: { errors, isSubmitting },
   } = useForm<PdfForm>({ resolver: zodResolver(pdfSchema) });
 
+  const triggerDownload = () => {
+    const a = document.createElement('a');
+    a.href = '/era-coffee-price.pdf';
+    a.download = 'ERA-Coffee-прайс.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
   const onSubmit = handleSubmit(async (data) => {
+    // Сохраняем лид (email) и сразу отдаём прайс на скачивание.
     await fetch('/api/contact', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ formType: 'pdf-price', ...data }),
     });
     reset();
+    triggerDownload();
     setSuccess(true);
   });
 
@@ -47,8 +58,8 @@ export function PdfLeadMagnet() {
                 Полный прайс с условиями оптовых поставок
               </h2>
               <p className="mt-4 body-text text-era-dark/70">
-                Получите PDF на почту — там же график обжарки, условия доставки
-                и спецификации для бухгалтерии
+                Скачайте PDF с ценами, тарифами по объёму и реквизитами —
+                файл откроется сразу после отправки контактов
               </p>
             </div>
 
@@ -89,8 +100,8 @@ export function PdfLeadMagnet() {
       <SuccessModal
         open={success}
         onClose={() => setSuccess(false)}
-        title="Готово"
-        message="Прайс уже отправляется на ваш email. Если письмо не пришло через 5 минут — проверьте папку «Спам»."
+        title="Прайс скачивается"
+        message="Файл с прайсом начал загружаться. Если загрузка не началась автоматически — нажмите кнопку ещё раз. Мы также сохранили ваши контакты и пришлём актуальные условия."
       />
     </section>
   );
